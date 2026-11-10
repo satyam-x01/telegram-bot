@@ -1,0 +1,11 @@
+neonize
+yt-dlp>=2026.08.19
+flask>=3.1.0
+google-genai>=2.16.0
+ddgs>=9.16.0
+pillow>=11.1.0
+qrcode[pil]>=8.2
+imageio-ffmpeg>=0.6.0
+python-dotenv>=1.0.0
+requests>=2.32.0
+segno>=1.6.0

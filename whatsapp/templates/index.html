@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Satyam WhatsApp Automation • Multi-User Research Engine</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="glow-bg top-left"></div>
+    <div class="glow-bg bottom-right"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="navbar">
+            <div class="brand">
+                <div class="brand-icon">⚡</div>
+                <div class="brand-text">
+                    <h1>Satyam WhatsApp Automation</h1>
+                    <span class="badge-version">Dynamic User Research Engine • 24/7 Active</span>
+                </div>
+            </div>
+            <div class="nav-status">
+                <div id="connectionPill" class="status-pill status-disconnected">
+                    <span class="status-dot"></span>
+                    <span id="connectionText">Checking connection...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Grid -->
+        <main class="dashboard-grid">
+            <!-- Left Column: WhatsApp Linking & QR -->
+            <section class="card qr-card">
+                <div class="card-header">
+                    <div class="card-title-group">
+                        <span class="icon">📱</span>
+                        <h2>WhatsApp Device Link</h2>
+                    </div>
+                    <span id="qrRefreshTimer" class="timer-badge">Auto-refreshing</span>
+                </div>
+
+                <div class="qr-content-wrapper">
+                    <!-- Disconnected / Pairing View -->
+                    <div id="qrBox" class="qr-box">
+                        <div id="qrLoading" class="qr-placeholder">
+                            <div class="spinner"></div>
+                            <p>Generating secure QR code...</p>
+                        </div>
+                        <img id="qrImage" src="" alt="WhatsApp QR Code" class="qr-image hidden">
+                    </div>
+
+                    <!-- Connected View -->
+                    <div id="connectedBox" class="connected-box hidden">
+                        <div class="success-ring">
+                            <span class="check-icon">✓</span>
+                        </div>
+                        <h3 id="connectedUser">WhatsApp Linked</h3>
+                        <p id="connectedPhone" class="mono-text">+91 ••••••••••</p>
+                        <div class="online-indicator">
+                            <span class="pulse-dot"></span> 24/7 Socket Active
+                        </div>
+                    </div>
+
+                    <div class="qr-instructions">
+                        <h4>How Users Connect:</h4>
+                        <ol>
+                            <li>Scan QR with WhatsApp on your phone (<strong>Linked Devices</strong>).</li>
+                            <li>Send <strong>hillo</strong> to the bot.</li>
+                            <li>Enter password: <strong>satyam08052010</strong>.</li>
+                            <li>Type whatever topic you want researched (e.g. <em>"Today news"</em>, <em>"Latest AI tools"</em>).</li>
+                            <li>Set your custom interval in minutes (no default forced!).</li>
+                            <li>Type <strong>start</strong> to begin your automated research!</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Middle Column: Dynamic Research Features & Engine Stats -->
+            <section class="card controls-card">
+                <div class="card-header">
+                    <div class="card-title-group">
+                        <span class="icon">🧠</span>
+                        <h2>Dynamic Live Research Engine</h2>
+                    </div>
+                    <span id="engineBadge" class="badge-status badge-active">Live Search 🟢</span>
+                </div>
+
+                <div class="metrics-row">
+                    <div class="metric-box">
+                        <span class="metric-label">Registered Users</span>
+                        <div class="metric-value" id="metricTotalUsers">0</div>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-label">Active Automations</span>
+                        <div class="metric-value" id="metricActiveUsers">0</div>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-label">AI Engine</span>
+                        <div class="metric-value"><small id="lblModel">Gemini 3.8 Flash</small></div>
+                    </div>
+                </div>
+
+                <!-- Features Highlight List -->
+                <div class="feature-pills">
+                    <span class="pill">🎯 Custom Topics: <strong>User Defined</strong></span>
+                    <span class="pill">⏱️ Custom Timers: <strong>User Set</strong></span>
+                    <span class="pill">🔍 Live Web Search: <strong>Real-time DDGS</strong></span>
+                    <span class="pill">🎬 YT/Insta Downloader: <strong>Active</strong></span>
+                    <span class="pill">🧹 24h Storage Cleaner: <strong>Auto-Purge</strong></span>
+                    <span class="pill">📸 Photo Analysis: <strong>Gemini Vision</strong></span>
+                </div>
+
+                <!-- Instructions Card -->
+                <div class="how-it-works-box">
+                    <h4>💡 How It Researches For Each User:</h4>
+                    <p>Instead of sending fixed hardcoded categories, every user chooses what they want researched (news, coding, AI, anime, tech). The bot searches live on the internet, verifies fresh results, and avoids sending duplicates to that user!</p>
+                </div>
+            </section>
+
+            <!-- Right Column: Admin Settings & Storage -->
+            <section class="card settings-card">
+                <div class="card-header">
+                    <div class="card-title-group">
+                        <span class="icon">⚙️</span>
+                        <h2>Admin Settings</h2>
+                    </div>
+                    <button id="btnSaveSettings" class="btn btn-sm btn-accent">Save</button>
+                </div>
+
+                <form id="settingsForm" class="settings-form" onsubmit="return false;">
+                    <div class="form-group">
+                        <label for="geminiApiKey">Google Gemini API Key:</label>
+                        <div class="input-with-icon">
+                            <input type="password" id="geminiApiKey" placeholder="Configured and active...">
+                            <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility('geminiApiKey')">👁️</button>
+                        </div>
+                        <small class="helper-text">Gemini 3.8 Flash powers chat, vision, and research synthesis.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="botPassword">Bot Master Password:</label>
+                        <input type="text" id="botPassword" value="satyam08052010">
+                        <small class="helper-text">Required by users after sending 'hillo' to access the bot.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="intervalMinutes">⏱️ Default Research Interval (Minutes):</label>
+                        <input type="number" id="intervalMinutes" min="1" max="1440" value="5">
+                        <small class="helper-text">Cycle interval (in minutes) for automated research discovery feeds.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="publicUrl">Public / Cloud Server URL (Optional):</label>
+                        <input type="text" id="publicUrl" placeholder="Auto-detected LAN (e.g. http://10.67.198.80:5000)">
+                        <small class="helper-text">For Cloudflare / Ngrok / VPS domains. Leave empty to auto-use your local WiFi IP.</small>
+                    </div>
+
+                    <div class="storage-manager-card" style="margin-bottom: 12px; background: rgba(59, 130, 246, 0.08); border-color: rgba(59, 130, 246, 0.3);">
+                        <div class="storage-info">
+                            <span>☁️ <strong>Cloudflare Public Tunnel (Outside WiFi):</strong></span>
+                            <small id="tunnelStatusText">Starting quick tunnel...</small>
+                            <div id="tunnelUrlBox" style="margin-top: 4px; word-break: break-all;">
+                                <code id="tunnelUrlCode" style="color: #60a5fa; font-size: 0.85rem;">Connecting...</code>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 6px; flex-shrink: 0; align-items: center;">
+                            <a id="btnOpenTunnel" href="/watch" target="_blank" class="btn btn-sm btn-outline" style="text-decoration: none; padding: 4px 10px;">Open ↗</a>
+                            <button id="btnRestartTunnel" type="button" class="btn btn-sm btn-outline" style="padding: 4px 8px;" title="Restart Cloudflare Tunnel">🔄</button>
+                        </div>
+                    </div>
+
+                    <div class="storage-manager-card" style="margin-bottom: 12px;">
+                        <div class="storage-info">
+                            <span>🎬 <strong>Cloud Video Portal:</strong></span>
+                            <small>Watch and download YouTube & Instagram videos in 1080p, 720p, 480p, MP3.</small>
+                        </div>
+                        <a href="/watch" target="_blank" class="btn btn-sm btn-outline" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Open Portal ↗</a>
+                    </div>
+
+                    <div class="storage-manager-card">
+                        <div class="storage-info">
+                            <span>🧹 <strong>Local Media 24h Auto-Clean</strong></span>
+                            <small>Downloaded videos are purged from PC disk after 24h to avoid storage buildup. WhatsApp chat copies remain untouched.</small>
+                        </div>
+                        <button id="btnCleanStorage" class="btn btn-sm btn-outline">Clean Now</button>
+                    </div>
+                </form>
+            </section>
+        </main>
+
+        <!-- Active Users & Automations Section -->
+        <section class="card users-section">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <span class="icon">👥</span>
+                    <h2>Users & Active Custom Automations</h2>
+                </div>
+                <span id="usersCounterBadge" class="badge-pill">0 users</span>
+            </div>
+
+            <div id="usersList" class="users-grid">
+                <div class="empty-state">
+                    <span class="empty-icon">📡</span>
+                    <p>No users have registered automations yet.<br>Users simply send <strong>hillo</strong> on WhatsApp to configure their custom topic and timer!</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

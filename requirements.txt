@@ -1,0 +1,9 @@
+python-telegram-bot[job-queue]>=20.8
+yt-dlp>=2024.12.13
+python-dotenv>=1.0.1
+aiofiles>=23.2.1
+requests>=2.31.0
+gdown>=6.4.0
+telethon>=1.36.0
+static-ffmpeg>=3.0; platform_system == "Windows"
+-r whatsapp/requirements.txt

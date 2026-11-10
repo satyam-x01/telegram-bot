@@ -1,0 +1,29 @@
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Environment & Sensitive Credentials
+.env
+.bot_credentials.json
+*.session
+*.session-journal
+universal_store_codes.txt
+premium_codes.txt
+
+# Database & Downloads
+downloads/
+music_bot.db
+music_bot.db-journal
+whatsapp/data/
+
+# Mobile & Flutter App Build Folders (not needed for 24/7 Bot Cloud Hosting)
+telegram_bot_app/
+apk/
+scratch/
+.kilo/
+
+# OS specific files
+.DS_Store
+Thumbs.db
