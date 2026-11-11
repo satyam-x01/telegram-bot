@@ -112,6 +112,7 @@ from handlers.admin_adv import (
 )
 from handlers.music_control import (
     play_command,
+    lastwave_command,
     webplay_command,
     vplay_command,
     pause_command,
@@ -764,6 +765,7 @@ def main():
 
     # Register Music Play & Search Commands
     add_cmd("play", play_command)
+    add_cmd("lastwave", lastwave_command)
     add_cmd("webplay", webplay_command)
     add_cmd("vplay", vplay_command)
     add_cmd("psname", psname_command)

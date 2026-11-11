@@ -1,3 +1,4 @@
+import asyncio
 import os
 import urllib.parse
 
@@ -20,6 +21,35 @@ async def play_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     query = " ".join(context.args)
     await process_and_send_song(update, context, query, category="play_cmd")
+
+async def lastwave_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/lastwave <song name> opens the official YouTube track link."""
+    if not context.args:
+        await update.message.reply_text(
+            "📌 Usage: `/lastwave <song name>`\nExample: `/lastwave Kesariya`",
+            parse_mode="Markdown",
+        )
+        return
+
+    song_query = " ".join(context.args)
+    status_msg = await update.message.reply_text("🔎 Searching for the official track link...")
+    result = await asyncio.to_thread(music_service.fast_get_video_id, song_query)
+    if not result or not result.get("video_id"):
+        await status_msg.edit_text(f"❌ No track found for: {escape_md(song_query)}", parse_mode="Markdown")
+        return
+
+    track_url = f"https://www.youtube.com/watch?v={result['video_id']}"
+    title = result.get("title") or song_query
+    artist = result.get("uploader") or ""
+    await status_msg.edit_text(
+        f"🎵 *{escape_md(title)}*\n"
+        f"👤 {escape_md(artist)}\n\n"
+        "Open the official track link. On Android, LastWave may open it if it is installed and set to handle YouTube links.",
+        parse_mode="Markdown",
+        reply_markup=InlineKeyboardMarkup([[
+            InlineKeyboardButton("▶️ Open track", url=track_url)
+        ]]),
+    )
 
 async def webplay_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """/webplay <authorized direct audio URL> [title]"""
