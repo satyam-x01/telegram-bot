@@ -1,3 +1,6 @@
+import os
+import urllib.parse
+
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 from handlers.music import process_and_send_song, send_audio_result
@@ -17,6 +20,57 @@ async def play_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     query = " ".join(context.args)
     await process_and_send_song(update, context, query, category="play_cmd")
+
+async def webplay_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/webplay <authorized direct audio URL> [title]"""
+    player_base_url = os.getenv("PLAYER_BASE_URL", "").strip().rstrip("/")
+    if not player_base_url:
+        await update.message.reply_text(
+            "⚠️ Web player is not configured. Set PLAYER_BASE_URL to your Cloudflare Pages URL in the Railway service variables."
+        )
+        return
+
+    try:
+        parsed_base = urllib.parse.urlsplit(player_base_url)
+    except ValueError:
+        parsed_base = None
+    if not parsed_base or parsed_base.scheme != "https" or not parsed_base.netloc:
+        await update.message.reply_text("⚠️ PLAYER_BASE_URL must be a valid HTTPS URL.")
+        return
+
+    if not context.args:
+        await update.message.reply_text(
+            "📌 Usage: `/webplay <authorized direct audio URL> [track title]`\n"
+            "Example: `/webplay https://example.com/your-own-track.mp3 My Track`\n\n"
+            "Use only audio you own or are authorized to stream.",
+            parse_mode="Markdown",
+        )
+        return
+
+    audio_url = context.args[0].strip()
+    try:
+        parsed_audio = urllib.parse.urlsplit(audio_url)
+    except ValueError:
+        parsed_audio = None
+    if (
+        not parsed_audio
+        or parsed_audio.scheme not in {"http", "https"}
+        or not parsed_audio.netloc
+        or len(audio_url) > 2000
+    ):
+        await update.message.reply_text("❌ Please provide a valid HTTP or HTTPS direct audio URL.")
+        return
+
+    title = " ".join(context.args[1:]).strip()[:160]
+    query = urllib.parse.urlencode({"audio": audio_url, "title": title})
+    player_url = f"{player_base_url}/?{query}"
+    await update.message.reply_text(
+        f"🎵 {escape_md(title or 'Audio track')}\nOpen the player and press Play. Only use authorized audio.",
+        parse_mode="Markdown",
+        reply_markup=InlineKeyboardMarkup([[
+            InlineKeyboardButton("▶️ Open player", url=player_url)
+        ]]),
+    )
 
 async def vplay_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """/vplay video music command handler"""

@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10131c">
+  <title>Music Player</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #10131c; color: #f4f5fb; }
+    * { box-sizing: border-box; }
+    body { min-height: 100vh; margin: 0; display: grid; place-items: center; padding: 20px; }
+    main { width: min(100%, 520px); padding: 28px; border: 1px solid #343b50; border-radius: 22px; background: #1b2030; box-shadow: 0 20px 70px #0006; }
+    h1 { margin: 0; font-size: 1.5rem; }
+    p { color: #b7bfd3; line-height: 1.55; }
+    label { display: block; margin: 18px 0 7px; color: #cbd2e4; font-size: .9rem; }
+    input { width: 100%; padding: 12px 14px; border: 1px solid #414a63; border-radius: 11px; background: #121725; color: #fff; font: inherit; }
+    button, .file-label { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 10px 16px; border: 0; border-radius: 12px; background: #6675f5; color: white; font: inherit; font-weight: 700; cursor: pointer; }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    .secondary { background: #343b52; }
+    .controls { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .track { margin-top: 22px; padding: 16px; border-radius: 15px; background: #121725; }
+    #track-title { margin: 0; overflow-wrap: anywhere; }
+    #track-artist, #status { margin: 6px 0 0; color: #aeb8cf; font-size: .92rem; overflow-wrap: anywhere; }
+    audio { display: none; }
+    .note { margin-top: 22px; padding-top: 14px; border-top: 1px solid #343b50; font-size: .82rem; }
+    #file-input { display: none; }
+    #status { min-height: 1.5em; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>🎵 Music Player</h1>
+    <p>Play an audio file you own or have permission to stream. Use a direct audio-file URL, or choose a file from this device.</p>
+
+    <section class="track" aria-live="polite">
+      <h2 id="track-title">No track selected</h2>
+      <p id="track-artist"></p>
+      <audio id="audio" preload="metadata" controls></audio>
+      <p id="status" role="status">Add an authorized audio source to begin.</p>
+      <div class="controls">
+        <button id="play-button" type="button" disabled>▶ Play</button>
+        <button id="share-button" class="secondary" type="button" disabled>🔗 Copy player link</button>
+      </div>
+    </section>
+
+    <label for="audio-url">Direct audio URL</label>
+    <input id="audio-url" type="url" inputmode="url" placeholder="https://example.com/your-audio.mp3" autocomplete="url">
+    <label for="title-input">Track title (optional)</label>
+    <input id="title-input" type="text" maxlength="160" placeholder="My track">
+    <label for="artist-input">Artist (optional)</label>
+    <input id="artist-input" type="text" maxlength="120" placeholder="Artist name">
+    <div class="controls">
+      <button id="load-button" type="button">Load audio URL</button>
+      <label class="file-label secondary" for="file-input">Choose audio file</label>
+      <input id="file-input" type="file" accept="audio/*">
+    </div>
+
+    <p class="note">This page does not host or provide music. External audio is loaded directly from its source and may be subject to that host's availability and terms. Only stream or share audio you are authorized to use.</p>
+  </main>
+  <script>
+    const audio = document.querySelector("#audio");
+    const title = document.querySelector("#track-title");
+    const artist = document.querySelector("#track-artist");
+    const status = document.querySelector("#status");
+    const urlInput = document.querySelector("#audio-url");
+    const titleInput = document.querySelector("#title-input");
+    const artistInput = document.querySelector("#artist-input");
+    const playButton = document.querySelector("#play-button");
+    const shareButton = document.querySelector("#share-button");
+    let localObjectUrl = "";
+
+    function setTrack(source, trackTitle, trackArtist) {
+      audio.pause();
+      audio.src = source;
+      audio.load();
+      title.textContent = trackTitle || "Audio track";
+      artist.textContent = trackArtist || "";
+      status.textContent = "Ready. Press Play to listen.";
+      playButton.disabled = false;
+      shareButton.disabled = !urlInput.value.trim();
+    }
+
+    document.querySelector("#load-button").addEventListener("click", () => {
+      const source = urlInput.value.trim();
+      let parsed;
+      try {
+        parsed = new URL(source);
+      } catch {
+        status.textContent = "Enter a valid direct audio URL.";
+        return;
+      }
+      if (!["http:", "https:"].includes(parsed.protocol)) {
+        status.textContent = "Only HTTP and HTTPS audio URLs are supported.";
+        return;
+      }
+      if (localObjectUrl) {
+        URL.revokeObjectURL(localObjectUrl);
+        localObjectUrl = "";
+      }
+      setTrack(parsed.href, titleInput.value.trim(), artistInput.value.trim());
+    });
+
+    document.querySelector("#file-input").addEventListener("change", (event) => {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith("audio/")) {
+        status.textContent = "Choose an audio file.";
+        return;
+      }
+      if (localObjectUrl) URL.revokeObjectURL(localObjectUrl);
+      localObjectUrl = URL.createObjectURL(file);
+      urlInput.value = "";
+      setTrack(localObjectUrl, titleInput.value.trim() || file.name, artistInput.value.trim());
+    });
+
+    playButton.addEventListener("click", async () => {
+      if (audio.paused) {
+        try {
+          await audio.play();
+        } catch {
+          status.textContent = "Could not play this source. Check the URL, format, and source permissions.";
+        }
+      } else {
+        audio.pause();
+      }
+    });
+
+    audio.addEventListener("play", () => { playButton.textContent = "⏸ Pause"; status.textContent = "Playing"; });
+    audio.addEventListener("pause", () => { playButton.textContent = "▶ Play"; if (audio.currentSrc) status.textContent = "Paused"; });
+    audio.addEventListener("ended", () => { status.textContent = "Track finished."; });
+    audio.addEventListener("error", () => { status.textContent = "Audio could not be loaded. The source may block playback or the URL may not be a direct audio file."; });
+
+    shareButton.addEventListener("click", async () => {
+      const shareUrl = new URL(window.location.href);
+      shareUrl.search = new URLSearchParams({
+        audio: urlInput.value.trim(),
+        title: titleInput.value.trim(),
+        artist: artistInput.value.trim()
+      }).toString();
+      try {
+        await navigator.clipboard.writeText(shareUrl.href);
+        status.textContent = "Player link copied.";
+      } catch {
+        status.textContent = "Could not copy the link. Copy it from your browser address bar after loading the audio.";
+      }
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    const sharedAudio = params.get("audio") || "";
+    titleInput.value = params.get("title") || "";
+    artistInput.value = params.get("artist") || "";
+    if (sharedAudio) {
+      urlInput.value = sharedAudio;
+      document.querySelector("#load-button").click();
+    }
+
+    window.addEventListener("beforeunload", () => {
+      if (localObjectUrl) URL.revokeObjectURL(localObjectUrl);
+    });
+  </script>
+</body>
+</html>
